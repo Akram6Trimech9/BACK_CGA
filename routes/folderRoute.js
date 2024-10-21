@@ -10,5 +10,5 @@ router.put('/:id', folderController.updateFolder);
 router.delete('/:id', folderController.deleteFolder);
 router.put('/:id/executed', folderController.updateExecutedStatus);
 router.put('/:id/rectified', folderController.updateRectifiedStatus);
-
+router.post('/transfer-folder', folderController.transferFolder);
 module.exports = router;

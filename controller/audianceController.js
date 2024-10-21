@@ -5,7 +5,7 @@ const Folder = require('../models/folder')
  
 exports.addAudiance = async (req, res) => {
   try {
-    const { dateAudiance, description, cercleId, numero } = req.body;
+    const { dateAudiance, description, cercleId, numero  , type} = req.body;
     const { adminId, affaireId } = req.params;
 
     if (!dateAudiance || !description) {
@@ -14,8 +14,7 @@ exports.addAudiance = async (req, res) => {
 
     const files = req.files ? req.files.map(file => file.path) : [];
 
-    // Check if the affaire exists
-    const existingAffaire = await Affaire.findById(affaireId);
+     const existingAffaire = await Affaire.findById(affaireId);
     if (!existingAffaire) {
       return res.status(404).json({ message: 'Affaire not found' });
     }
@@ -24,7 +23,7 @@ exports.addAudiance = async (req, res) => {
       dateAudiance,
       description,
       affaires: affaireId,
- 
+      type,
       numero,
       cercle: cercleId,
       files,
@@ -131,7 +130,7 @@ exports.getAudiancesByAffaire= async (req, res) => {
 
  exports.updateAudiance = async (req, res) => {
   try {
-    const { dateAudiance, description, inventaires, affairesData, addressData, file } = req.body;
+    const { dateAudiance, description, inventaires, affairesData, addressData,type, file } = req.body;
 
     let updatedAudiance = await Audiance.findById(req.params.id);
     if (!updatedAudiance) {
@@ -140,6 +139,8 @@ exports.getAudiancesByAffaire= async (req, res) => {
 
      updatedAudiance.dateAudiance = dateAudiance || updatedAudiance.dateAudiance;
     updatedAudiance.description = description || updatedAudiance.description;
+    updatedAudiance.type = type || updatedAudiance.type;
+
     updatedAudiance.inventaires = inventaires || updatedAudiance.inventaires;
     updatedAudiance.file = file || updatedAudiance.file;
 
@@ -149,14 +150,14 @@ exports.getAudiancesByAffaire= async (req, res) => {
         affaire.numeroAffaire = affairesData.numeroAffaire;
         affaire.natureAffaire = affairesData.natureAffaire;
         affaire.opposite = affairesData.opposite;
+
         affaire.aboutissement = affairesData.aboutissement;
         await affaire.save();
         updatedAudiance.affaires = affaire._id;
       }
     }
 
-    // Update associated Address if provided
-    if (addressData) {
+     if (addressData) {
       let address = await Address.findById(addressData._id);
       if (address) {
         address.city = addressData.city;

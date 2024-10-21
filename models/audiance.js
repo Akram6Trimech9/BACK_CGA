@@ -27,7 +27,12 @@ var audianceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cercle',
     }, 
-  
+    type: {
+        type: String,
+        enum: ['Première audience', 'Audience préparatoire', 'Plaidoirie'],
+        required: true
+    },
+ 
     files: [{ 
         type: String,
         required: false

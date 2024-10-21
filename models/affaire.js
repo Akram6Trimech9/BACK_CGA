@@ -10,38 +10,53 @@ var affaireSchema = new mongoose.Schema({
         enum : ['civil', 'pénale', 'administrative', 'commerciale'],
         required: true
     },
+    statusClient :{ 
+        type: String,
+        enum : ['plaignant', 'accuse'],
+        required: false
+    },
+
+    dateDemande :{ 
+        type: Date,
+        required: false
+    },
     degre:{
         type: String,
-        enum : ['première_instance', 'appel', 'cour_suprême'],
+        enum : ['première_instance', 'appel', 'cassastion'],
         required: true
     },
     opposite: {
         type: String,
         required: true
     }, 
+    avocatId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }, 
     aboutissement: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Justification',
     }, 
-    folder:{
+    folder: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Folder',
     },
     inventaire: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Inventaire',
+        ref: 'User'
     }],
-    audiances: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Audiance' }] ,
-    file: { 
-        type: String,
-        required: false
-    },
+    audiances: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Audiance'
+    }],
     credit: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Credit'
     },
-},{
-  timestamps: true
-});
+    file: {
+        type: String,
+        required: false
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Affaire', affaireSchema);

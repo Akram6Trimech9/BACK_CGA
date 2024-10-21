@@ -8,6 +8,9 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const dbConnect = require('./config/dbConnect');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
+const checkReminders = require('./config/checkReminders'); 
+const cron = require('node-cron');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,9 +21,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
-
-// Router setup
-const authRouter = require('./routes/userRoute');
+cron.schedule('*/3 * * * * *', async () => {
+  try {
+    await checkReminders();
+  } catch (error) {
+    console.error('Error in cron job:', error);
+  }
+});
+ const authRouter = require('./routes/userRoute');
 const rdvRouter = require('./routes/rdvRoute');
 const contactRouter = require('./routes/contactRoute');
 const documentRouter = require('./routes/documentsRoute');
@@ -40,7 +48,14 @@ const justificationRoute  = require('./routes/justificationRoute')
 const depenseRoute  = require('./routes/depenseRoute')
 const parEmailRoute  = require('./routes/parEmailRoute')
 const guestRoute  = require('./routes/guestRoute')
+const tribinauxRoute  = require('./routes/tribinauxRoute')
+const delaiRoute  = require('./routes/delaiRoute')
+const cabinetRoute  = require('./routes/cabinetRoute')
 
+const procesRoute  = require('./routes/procesRoute')
+const transactionRoute  = require('./routes/transactionRoute')
+
+const reminderRoutes = require('./config/checkReminders');
 const { sendSms } = require('./services/sendSms');   
 app.use('/api/user', authRouter);
 app.use('/api/rdvs', rdvRouter);
@@ -62,6 +77,11 @@ app.use('/api/justification', justificationRoute);
 app.use('/api/depense', depenseRoute);
 app.use('/api/emails', parEmailRoute);
 app.use('/api/guest', guestRoute);
+app.use('/api/tribinaux', tribinauxRoute);
+app.use('/api/proces', procesRoute);
+app.use('/api/delai', delaiRoute);
+app.use('/api/cabinet', cabinetRoute);
+app.use('/api/transaction', transactionRoute);
 
 app.use(notFound);
 app.use(errorHandler);

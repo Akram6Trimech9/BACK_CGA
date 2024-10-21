@@ -4,12 +4,14 @@ const {generateToken} = require('../config/jwt')
 const asyncHandler = require('express-async-handler')
 const validateMongoDbId = require('../utils/validateMongoDbId')
 const {generateRefreshToken} =require('../config/refreshToken')
-const { sendEmailWithAttachments, sendWelcomeWithCredentials } = require('../services/emailService');
+const { sendEmailWithAttachments, sendWelcomeWithCredentials, sendCredentielToSousAdmin } = require('../services/emailService');
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv').config();
 const Guest = require('../models/guest')
 const Rdv = require('../models/rdv')
+const Cabinet = require('../models/cabinet')
+
 const createUser = asyncHandler(async (req, res) => {
   const { email } = req.body;
   console.log(req.body)
@@ -533,6 +535,59 @@ const searchClients = async (req, res) => {
     });
   }
 };
+const addSousAdmin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { adminId } = req.params;
+
+    console.log(req.body)
+     const findUser = await User.findOne({ email });
+    if (findUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+     let userProfilePath = null;
+    if (req.file) {
+      userProfilePath = `${process.env.BACKEND_URL}/uploads/images/${req.file.filename}`;
+    }
+
+     const newUser = new User({
+      ...req.body,
+      userProfile: userProfilePath,
+      isBlocked: false,
+      verificationCode: ''
+    });
+
+     const saved = await newUser.save();
+
+     const updateAdmin = await User.findByIdAndUpdate(
+      adminId,
+      { $push: { sousAdminList: saved._id } },
+      { new: true }
+    );
+
+     const updateSousAdmin = await User.findByIdAndUpdate(
+      saved._id,
+      { $push: { underAdmin: adminId } },
+      { new: true }
+    );
+
+     const updateCabinet = await Cabinet.findOneAndUpdate(
+      { admin: adminId },
+      { $push: { sousAdmins: saved._id } },
+      { new: true }
+    );
+
+     if (updateAdmin && updateSousAdmin && updateCabinet) {
+      //  await sendCredentielToSousAdmin(req.body.email, req.body.email, req.body.password, updateCabinet);
+      return res.status(201).json(saved);
+    } else {
+      return res.status(400).json({ message: 'Something went wrong during the update process' });
+    }
+  } catch (error) {
+     return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
 
 
-module.exports = {createUserForGuest,searchClients,verifyAccountWithCode,getClients, getAvocats ,verifiedAccount , sendVerificationLink, loginAdmin , resetPassword , forgotPasswordToken ,  updatePassword , logout ,  handleRefreshToken , createUser, login , getAllUsers , getOneUser , deleteUser , updateUser ,blockUser , unBlockUser } ;
+module.exports = {addSousAdmin,createUserForGuest,searchClients,verifyAccountWithCode,getClients, getAvocats ,verifiedAccount , sendVerificationLink, loginAdmin , resetPassword , forgotPasswordToken ,  updatePassword , logout ,  handleRefreshToken , createUser, login , getAllUsers , getOneUser , deleteUser , updateUser ,blockUser , unBlockUser } ;

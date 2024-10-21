@@ -1,6 +1,54 @@
 const Folder = require('../models/folder'); 
 const User = require('../models/user');
 const Affaire  = require('../models/affaire');
+const FolderTransaction = require('../models/folderTransactions');
+
+
+const transferFolder = async (req, res) => {
+    try {
+        const { folderId, fromUserId, toUserId, message } = req.body;
+
+         if (!folderId || !fromUserId || !toUserId || !message) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+         const folder = await Folder.findById(folderId);
+        if (!folder) {
+            return res.status(404).json({ message: 'Folder not found' });
+        }
+
+         const fromUser = await User.findById(fromUserId);
+        const toUser = await User.findById(toUserId);
+        if (!fromUser) {
+            return res.status(404).json({ message: 'From user not found' });
+        }
+        if (!toUser) {
+            return res.status(404).json({ message: 'To user not found' });
+        }
+
+         folder.avocat = toUserId;
+        await folder.save();
+
+         const folderTransaction = new FolderTransaction({
+            from: fromUserId,
+            to: toUserId,
+            message: message,
+            folder:folderId
+        });
+        await folderTransaction.save();
+
+        // fromUser.folders = fromUser.folders.filter(f => f.toString() !== folderId);
+        // await fromUser.save();
+
+        toUser.folders.push(folder._id);
+        await toUser.save();
+
+        res.status(200).json({ message: 'Folder transferred successfully', folder });
+    } catch (error) {
+        res.status(500).json({ message: 'Error transferring folder', error: error.message });
+    }
+};
+
  const createFolder = async (req, res) => {
     try {
         const { titleFolder, numberFolder, client, avocat } = req.body;
@@ -49,6 +97,8 @@ const Affaire  = require('../models/affaire');
     try {
         const avocatId = req.params.avocatId;
         const folders = await Folder.find({ avocat: avocatId }).populate('client avocat');
+        console.log(folders)
+
         if (!folders.length) {
             return res.status(404).json({ message: 'No folders found for this avocat' });
         }
@@ -182,4 +232,5 @@ module.exports = {
     deleteFolder,
     updateExecutedStatus,
     updateRectifiedStatus,
+    transferFolder
 };

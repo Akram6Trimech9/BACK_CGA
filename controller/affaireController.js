@@ -9,19 +9,38 @@ const fs = require('fs');
 const { generatePDF } = require('../services/generatePdf');
 exports.createAffaire = async (req, res) => {
     try {
-        const { numeroAffaire, natureAffaire, opposite, file, credit,degre } = req.body;
-   const {folderId } = req.params
-         const filePath = req.file ? req.file.path : file;  
+ 
+         const { 
+            numeroAffaire,       
+            natureAffaire,       
+            opposite,            
+            degre,               
+             statusClient,         
+            dateDemande,  
+         } = req.body;
+        
+         const { folderId } = req.params;
 
-        const newAffaire = new Affaire({
+         if (!numeroAffaire || !natureAffaire || !opposite || !degre || !folderId) {
+            return res.status(400).json({ success: false, message: 'Missing required fields: numeroAffaire, natureAffaire, opposite, degre, or folderId.' });
+        }
+
+         const filePath = req.file ? req.file.path : null;
+
+         const affaireData = {
             numeroAffaire,
             natureAffaire,
             opposite,
             degre,
             folder: folderId,
-            file: filePath,
-            credit
-        });
+            file: filePath,      
+        };
+
+         if (dateDemande) affaireData.dateDemande = dateDemande;
+        if (statusClient) affaireData.statusClient = statusClient;
+
+        const newAffaire = new Affaire(affaireData);
+ 
 
         const savedAffaire = await newAffaire.save();
 
@@ -62,7 +81,6 @@ exports.getAffaireClient= async(req,res) =>{
    
         const affaires = await Affaire.find({ _id: { $in: affaireIds } }).populate('audiances').populate('aboutissement').populate('inventaire')
    
-   console.log(affaires,"affaires")
    
        if (!affaires.length) {
          return res.status(404).json({ message: 'No affaires found for the folders.' });
@@ -252,36 +270,36 @@ exports.addIntervenantToAffaire= async (req, res) => {
 exports.getAllAffairesByAvocat = async (req, res) => {
     const { avocatId } = req.params;
     const { clientName, folderNumber, degre, page = 1, limit = 10 } = req.query;
-
     try {
-        const foldersQuery = { avocat: avocatId }; // Filter by avocat
-
-        // Apply optional filters
+        const foldersQuery = { avocat: avocatId };
         if (clientName) {
-            const client = await User.findOne({ name: clientName });
+             const client = await User.findOne({ lastname: clientName });
+            console.log(client)
             if (client) {
-                foldersQuery.client = client._id; // Filter by client ID if found
+                foldersQuery.client = client._id;
             }
         }
 
         if (folderNumber) {
-            foldersQuery.numberFolder = folderNumber; // Filter by folder number
+            foldersQuery.numberFolder = folderNumber;
         }
 
         const folders = await Folder.find(foldersQuery);
-
         if (!folders.length) {
             return res.status(404).json({ message: 'No folders found for this avocat.' });
         }
 
         const affaireIds = folders.flatMap(folder => folder.affairs);
-        
+
         const affairesQuery = {};
         if (degre) {
-            affairesQuery.degre = degre; // Filter by degree
-        }
+            affairesQuery.degre = degre; 
+        }       
+
 
         const totalAffaires = await Affaire.countDocuments({ _id: { $in: affaireIds }, ...affairesQuery });
+        console.log(totalAffaires)
+       
         const affaires = await Affaire.find({ _id: { $in: affaireIds }, ...affairesQuery })
             .populate('folder')
             .populate('inventaire')

@@ -98,9 +98,41 @@ const sendWelcomeEmail = async (email) => {
   }
 };
 
+async function sendCredentielToSousAdmin(to, email, password, cabinet) {
+  const subject = 'Vous avez été ajouté en tant que Sous Admin';
+  const attachments = [];  
+  const mailOptions = {
+    from: 'akramtrimech97@gmail.com',  
+    to: to,
+    subject: `Invitation de l'admin du cabinet ${cabinet.name}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+        <h1 style="color: #0d529f;">Bienvenue en tant que Sous Admin !</h1>
+        <p>L'administrateur de <strong>${cabinet.name}</strong> vous a ajouté comme Sous Admin sur notre plateforme.</p>
+        <p>Voici vos identifiants de connexion :</p>
+        <p><strong>Email :</strong> ${email}</p>
+        <p><strong>Mot de passe :</strong> ${password}</p>
+        <p>Nous vous recommandons de changer votre mot de passe après votre première connexion.</p>
+        <p style="font-size: 16px;">À très bientôt !</p>
+        <p style="color: #ffd146;">L'équipe</p>
+      </div>
+    `
+  };
+
+   try {
+    const info = await transporter.sendMail(mailOptions);
+     return info;
+  } catch (err) {
+    console.log('Erreur lors de l\'envoi des identifiants:', err);
+    throw err;
+  }
+}
+
+
 module.exports = {
   sendEmailWithAttachments,
   readHTMLTemplate,
   sendWelcomeWithCredentials,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  sendCredentielToSousAdmin
 };

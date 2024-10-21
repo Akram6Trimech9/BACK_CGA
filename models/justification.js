@@ -25,6 +25,11 @@ const JustificationSchema = new mongoose.Schema({
         type: String, 
         required: false
     },
+    natureJugement: { 
+        type: String, 
+        enum:['presense','absence'],
+        required: false
+    },
     situationClient: {  
         type: String,
         enum: [

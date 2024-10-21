@@ -14,6 +14,11 @@ var folderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Affaire',
     }],
+
+    proces:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Proces',
+    }],
     client: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

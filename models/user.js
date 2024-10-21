@@ -40,9 +40,21 @@ var userSchema = new mongoose.Schema({
     },
     role :{ 
         type: String,
-                enum : ['CLIENT','ADMIN','GUEST'],
+                enum : ['CLIENT','ADMIN','GUEST','SOUS_ADMIN'],
                 default: 'GUEST'
     }, 
+    underAdmin:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    } , 
+    cabinet:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Cabinet',
+    } , 
+    sousAdminList:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     clients: [
         {
           type: mongoose.Schema.Types.ObjectId,
