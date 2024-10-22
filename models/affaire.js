@@ -7,7 +7,7 @@ var affaireSchema = new mongoose.Schema({
     }, 
     category :{ 
         type: String,
-        enum : ['civil', 'pénale', 'administrative', 'tribunal', 'commerciale' , 'immobilère', 'militaire' ],
+        enum : ['civil', 'pénale', 'administrative',  'commerciale' , 'immobilère', 'militaire' ],
         required: true
     },
     natureAffaire : {
