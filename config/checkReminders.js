@@ -36,7 +36,7 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
   } else if (category === 'civil') {
     for (const audiance of audiances) {
  
-      const dateR = Math.floor((Date.now() -audiance.dateAudiance.getTime()   ) / (1000 * 60 * 60 * 24));
+      const dateR = Math.floor((audiance.dateAudiance.getTime()- Date.now()   ) / (1000 * 60 * 60 * 24));
       if (audiance.type === 'Plaidoirie') {
         console.log(dateR,"dateR")
         let type = 'plaidoirie';
