@@ -1,6 +1,6 @@
-const Folder = require('../models/folder'); 
+const Folder = require('../models/folder');
 const User = require('../models/user');
-const Affaire  = require('../models/affaire');
+const Affaire = require('../models/affaire');
 const FolderTransaction = require('../models/folderTransactions');
 
 
@@ -8,16 +8,16 @@ const transferFolder = async (req, res) => {
     try {
         const { folderId, fromUserId, toUserId, message } = req.body;
 
-         if (!folderId || !fromUserId || !toUserId || !message) {
+        if (!folderId || !fromUserId || !toUserId || !message) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-         const folder = await Folder.findById(folderId);
+        const folder = await Folder.findById(folderId);
         if (!folder) {
             return res.status(404).json({ message: 'Folder not found' });
         }
 
-         const fromUser = await User.findById(fromUserId);
+        const fromUser = await User.findById(fromUserId);
         const toUser = await User.findById(toUserId);
         if (!fromUser) {
             return res.status(404).json({ message: 'From user not found' });
@@ -26,14 +26,14 @@ const transferFolder = async (req, res) => {
             return res.status(404).json({ message: 'To user not found' });
         }
 
-         folder.avocat = toUserId;
+        folder.avocat = toUserId;
         await folder.save();
 
-         const folderTransaction = new FolderTransaction({
+        const folderTransaction = new FolderTransaction({
             from: fromUserId,
             to: toUserId,
             message: message,
-            folder:folderId
+            folder: folderId
         });
         await folderTransaction.save();
 
@@ -49,16 +49,16 @@ const transferFolder = async (req, res) => {
     }
 };
 
- const createFolder = async (req, res) => {
+const createFolder = async (req, res) => {
     try {
         const { titleFolder, numberFolder, client, avocat } = req.body;
 
-   console.log(req.body)
+        console.log(req.body)
         if (!titleFolder || !numberFolder || !client || !avocat) {
             return res.status(400).json({ message: 'All required fields must be provided' });
         }
 
-         const clientFinded = await User.findById(client);
+        const clientFinded = await User.findById(client);
         const avocatFinded = await User.findById(avocat);
 
         if (!clientFinded) {
@@ -69,16 +69,16 @@ const transferFolder = async (req, res) => {
             return res.status(404).json({ message: 'Avocat not found' });
         }
 
-         const newFolder = new Folder({
+        const newFolder = new Folder({
             titleFolder,
             numberFolder,
-             client,
+            client,
             avocat
         });
- console.log(newFolder,clientFinded,avocatFinded,"avocatFinded")
+        console.log(newFolder, clientFinded, avocatFinded, "avocatFinded")
         await newFolder.save();
 
-         clientFinded.folders = clientFinded.folders || [];
+        clientFinded.folders = clientFinded.folders || [];
         clientFinded.folders.push(newFolder._id);
 
         avocatFinded.folders = avocatFinded.folders || [];
@@ -93,7 +93,7 @@ const transferFolder = async (req, res) => {
     }
 };
 
- const getFoldersByAvocat = async (req, res) => {
+const getFoldersByAvocat = async (req, res) => {
     try {
         const avocatId = req.params.avocatId;
         const folders = await Folder.find({ avocat: avocatId }).populate('client avocat');
@@ -108,32 +108,32 @@ const transferFolder = async (req, res) => {
     }
 };
 
- const getFoldersByClient = async (req, res) => {
+const getFoldersByClient = async (req, res) => {
     try {
         const clientId = req.params.clientId;
         console.log(clientId)
         const folders = await Folder.find({ client: clientId }).populate('client avocat affairs');
-        
+
         console.log(folders.length)
 
         if (!folders.length) {
             return res.status(404).json({ message: 'No folders found for this client' });
         }
 
-  
-         let affaires = []
+
+        let affaires = []
         folders.forEach(folder => {
-           if(folder.affairs){ 
-             affaires.push(...folder.affairs)
-           }
-       });
+            if (folder.affairs) {
+                affaires.push(...folder.affairs)
+            }
+        });
         res.status(200).json(affaires);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
- const getFolderById = async (req, res) => {
+const getFolderById = async (req, res) => {
     try {
         const folderId = req.params.id;
         const folder = await Folder.findById(folderId).populate('client avocat');
@@ -146,7 +146,7 @@ const transferFolder = async (req, res) => {
     }
 };
 
- const updateFolder = async (req, res) => {
+const updateFolder = async (req, res) => {
     try {
         const folderId = req.params.id;
         const updates = req.body;
@@ -160,7 +160,7 @@ const transferFolder = async (req, res) => {
     }
 };
 
- const deleteFolder = async (req, res) => {
+const deleteFolder = async (req, res) => {
     try {
         const folderId = req.params.id;
         const deletedFolder = await Folder.findByIdAndDelete(folderId);
@@ -169,7 +169,7 @@ const transferFolder = async (req, res) => {
             return res.status(404).json({ message: 'Folder not found' });
         }
 
-         await User.updateMany(
+        await User.updateMany(
             { $or: [{ folders: folderId }] },
             { $pull: { folders: folderId } }
         );
@@ -180,7 +180,7 @@ const transferFolder = async (req, res) => {
     }
 };
 
- const updateExecutedStatus = async (req, res) => {
+const updateExecutedStatus = async (req, res) => {
     try {
         const folderId = req.params.id;
         const { isExecuted } = req.body;
@@ -200,7 +200,7 @@ const transferFolder = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
- 
+
 
 const updateRectifiedStatus = async (req, res) => {
     try {

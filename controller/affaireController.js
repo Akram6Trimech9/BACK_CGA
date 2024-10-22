@@ -15,13 +15,14 @@ exports.createAffaire = async (req, res) => {
             natureAffaire,       
             opposite,            
             degre,               
+            category,
              statusClient,         
             dateDemande,  
          } = req.body;
         
          const { folderId } = req.params;
 
-         if (!numeroAffaire || !natureAffaire || !opposite || !degre || !folderId) {
+         if (!numeroAffaire || !natureAffaire || !category  || !opposite || !degre || !folderId) {
             return res.status(400).json({ success: false, message: 'Missing required fields: numeroAffaire, natureAffaire, opposite, degre, or folderId.' });
         }
 
@@ -31,6 +32,7 @@ exports.createAffaire = async (req, res) => {
             numeroAffaire,
             natureAffaire,
             opposite,
+            category,
             degre,
             folder: folderId,
             file: filePath,      
@@ -121,13 +123,13 @@ exports.getAffaireByAdmin = async(req,res) =>{
 exports.updateAffaire = async (req, res) => {
     try {
         const { affaireId } = req.params;
-        const { numeroAffaire, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
+        const { numeroAffaire,category, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
 
         const filePath = req.file ? req.file.path : file; // Use the uploaded file path or the existing file path
 
         const updatedAffaire = await Affaire.findByIdAndUpdate(
             affaireId,
-            { numeroAffaire, natureAffaire, opposite, aboutissement, folder: folderId, file: filePath, credit },
+            { numeroAffaire, natureAffaire,category, opposite, aboutissement, folder: folderId, file: filePath, credit },
             { new: true }
         );
 

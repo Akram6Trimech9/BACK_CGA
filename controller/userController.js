@@ -579,7 +579,7 @@ const addSousAdmin = async (req, res) => {
     );
 
      if (updateAdmin && updateSousAdmin && updateCabinet) {
-      //  await sendCredentielToSousAdmin(req.body.email, req.body.email, req.body.password, updateCabinet);
+       await sendCredentielToSousAdmin(req.body.email, req.body.email, req.body.password, updateCabinet);
       return res.status(201).json(saved);
     } else {
       return res.status(400).json({ message: 'Something went wrong during the update process' });

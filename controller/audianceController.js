@@ -5,7 +5,7 @@ const Folder = require('../models/folder')
  
 exports.addAudiance = async (req, res) => {
   try {
-    const { dateAudiance, description, cercleId, numero  , type} = req.body;
+    const { dateAudiance, description, tribunalId, numero  , type} = req.body;
     const { adminId, affaireId } = req.params;
 
     if (!dateAudiance || !description) {
@@ -25,7 +25,7 @@ exports.addAudiance = async (req, res) => {
       affaires: affaireId,
       type,
       numero,
-      cercle: cercleId,
+      tribunal: tribunalId,
       files,
     });
 
@@ -73,7 +73,7 @@ exports.getAudianceByAdmin = async (req, res) => {
 
      const audiances = await Audiance.find({ _id: { $in: audianceIds } })
       .populate('affaires')
-      .populate('cercle')
+      .populate('tribunal')
       .populate('delegation')
       .populate('city')
       .populate('inventaires');
@@ -89,7 +89,7 @@ exports.getAudiancesByAffaire= async (req, res) => {
   try {
     const audiances = await Audiance.find({affaires:affaireId})
       .populate('affaires')
-      .populate('cercle')
+      .populate('tribunal')
       .populate('inventaires');
     return res.status(200).json(audiances);
   } catch (error) {
@@ -101,7 +101,7 @@ exports.getAudiancesByAffaire= async (req, res) => {
   try {
     const audiances = await Audiance.find()
       .populate('affaires')
-      .populate('cercle')
+      .populate('tribunal')
       .populate('delegation')
       .populate('city')
       .populate('inventaires');

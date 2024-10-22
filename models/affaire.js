@@ -5,10 +5,15 @@ var affaireSchema = new mongoose.Schema({
         type: Number,
         required: true
     }, 
-    natureAffaire :{ 
+    category :{ 
         type: String,
-        enum : ['civil', 'pénale', 'administrative', 'commerciale'],
+        enum : ['civil', 'pénale', 'administrative', 'tribunal', 'commerciale' , 'immobilère', 'militaire' ],
         required: true
+    },
+    natureAffaire : {
+        type: String,
+        enum : ['mise à jour', 'enregistrement facultatif','incartade','criminelle','enfants-incartade','enfants délinquants'],
+        required: true    
     },
     statusClient :{ 
         type: String,
@@ -22,7 +27,7 @@ var affaireSchema = new mongoose.Schema({
     },
     degre:{
         type: String,
-        enum : ['première_instance', 'appel', 'cassastion'],
+        enum : ['première_instance', 'appel', 'cassastion','demande de réexamen', 'oppositionPremier' ,'oppositionAppel'],
         required: true
     },
     opposite: {
@@ -53,6 +58,7 @@ var affaireSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Credit'
     },
+ 
     file: {
         type: String,
         required: false

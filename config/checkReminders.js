@@ -11,18 +11,18 @@ async function checkReminders() {
       .populate('folder');
 
     for (const affair of affairs) {
-      const { audiances, degre, aboutissement, opposite, natureAffaire, statusClient, dateDemande, folder } = affair;
+      const { audiances, degre, aboutissement, opposite, category, statusClient, dateDemande, folder } = affair;
 
-      await checkDegreeDeadlines(audiances, degre, aboutissement, folder.avocat, affair._id, natureAffaire, statusClient, dateDemande);
-      await handleUpcomingAudiences(affair, opposite, natureAffaire, statusClient);
+      await checkDegreeDeadlines(audiances, degre, aboutissement, folder.avocat, affair._id, category, statusClient, dateDemande);
+      await handleUpcomingAudiences(affair, opposite, category, statusClient);
     }
   } catch (error) {
     console.error('Error checking reminders:', error);
   }
 }
 
-async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, natureAffaire, statusClient, dateDemande) {
-  if (natureAffaire === 'pénale' && aboutissement && aboutissement.natureJugement === 'présence') {
+async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande) {
+  if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'présence') {
     const checkDate = aboutissement.date || aboutissement.dateAppel || aboutissement.dateCassation;
     if (checkDate) {
       const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -34,7 +34,7 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
         }
       }
     }
-  } else if (natureAffaire === 'civil') {
+  } else if (category === 'civil') {
     for (const audiance of audiances) {
  
       const dateR = Math.floor((audiance.dateAudiance.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -83,9 +83,9 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
   }
 }
 
-async function handleUpcomingAudiences(affair, avocatId, natureAffaire, statusClient) {
+async function handleUpcomingAudiences(affair, avocatId, category, statusClient) {
   const today = Date.now();
-  if (natureAffaire === 'civile') {
+  if (category === 'civil') {
     const upcomingAudiences = affair.audiances.filter(audiance => {
       const daysRemaining = Math.floor((audiance.dateAudiance.getTime() - today) / (1000 * 60 * 60 * 24));
       return daysRemaining >= 0 && daysRemaining <= 23;

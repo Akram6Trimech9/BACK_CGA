@@ -6,10 +6,15 @@ var procesShema = new mongoose.Schema({
         type: Number,
         required: true
     }, 
+    type :{ 
+        type: String,
+        enum:['plaintes','procés directe','chéque'],
+        required: true
+    }, 
     tribunal :{ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tribinaux',
-    },
+    }, 
     folder:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Folder',
@@ -18,6 +23,7 @@ var procesShema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
+ 
  
     year:{
         type: String,

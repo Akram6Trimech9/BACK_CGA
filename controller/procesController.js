@@ -1,21 +1,26 @@
 const Proces = require('../models/proces')
 const Folder = require('../models/folder')
-
+const User = require('../models/user')
 exports.createProces = async (req, res) => {
     try {
-        const { nbreTribunal, tribunal , file, year } = req.body;
-        const {folderId } = req.params
-         const filePath = req.file ? req.file.path : file;  
+        const { nbreTribunal, tribunal, file, year , type ,clientId } = req.body;
+        const { folderId } = req.params;
+        const filePath = req.file ? req.file.path : file;  
 
         const newProces = new Proces({
             nbreTribunal,
             tribunal,
+            type,
             year,
             folder: folderId,
             file: filePath,
-         });
+            client:clientId
+        });
 
-        const savedProces = await newProces.save();
+        let savedProces = await newProces.save();
+
+         savedProces = await Proces.findById(savedProces._id).populate('tribunal');
+
         await Folder.findByIdAndUpdate(
             folderId,
             { $push: { proces: savedProces._id } },
@@ -27,6 +32,61 @@ exports.createProces = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+ 
+exports.searchProces = async (req, res) => {
+    try {
+        const { folderNumber, username, lastname, nbreTribunal, type } = req.query;  
+        const { page = 1, limit = 10 } = req.query; 
+
+         let query = {};
+
+        if (folderNumber) {
+            const folder = await Folder.findOne({ folderNumber }); 
+            if (folder) {
+                query.folder = folder._id;  
+            }
+        }
+
+        if (username || lastname) {
+            const clientQuery = {};
+            if (username) {
+                clientQuery.username = { $regex: username, $options: 'i' }; 
+            }
+            if (lastname) {
+                clientQuery.lastname = { $regex: lastname, $options: 'i' }; 
+            }
+            const clients = await User.find(clientQuery, '_id');  
+            const clientIds = clients.map(client => client._id);
+            query.client = { $in: clientIds };  
+        }
+
+        if (nbreTribunal) {
+            query.nbreTribunal = nbreTribunal;
+        }
+
+        if (type) {
+            query.type = type;
+        }
+
+         const processes = await Proces.find(query)
+            .populate('client', 'username lastname')  
+            .populate('tribunal')  
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+
+        const count = await Proces.countDocuments(query);
+
+        res.status(200).json({
+            success: true,
+            data: processes,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 exports.findByFolder = async (req, res) => {
     try {
@@ -34,6 +94,7 @@ exports.findByFolder = async (req, res) => {
         const { page = 1, limit = 10 } = req.query;
 
         const processes = await Proces.find({ folder: folderId })
+            .populate('tribunal')  // Populate the tribunal field
             .limit(limit * 1)   
             .skip((page - 1) * limit)
             .exec();
@@ -50,6 +111,7 @@ exports.findByFolder = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 exports.findByClient = async (req, res) => {
     try {

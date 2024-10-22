@@ -23,9 +23,9 @@ var audianceSchema = new mongoose.Schema({
         ref: 'Affaire',
     }, 
   
-    cercle: {
+    tribunal: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Cercle',
+        ref: 'Tribinaux',
     }, 
     type: {
         type: String,
