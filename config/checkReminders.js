@@ -14,7 +14,7 @@ async function checkReminders() {
       const { audiances, degre, aboutissement, opposite, category, statusClient, dateDemande, folder } = affair;
 
       await checkDegreeDeadlines(audiances, degre, aboutissement, folder.avocat, affair._id, category, statusClient, dateDemande);
-      await handleUpcomingAudiences(affair, opposite, category, statusClient);
+      await handleUpcomingAudiences(affair, folder.avocat, category, statusClient);
     }
   } catch (error) {
     console.error('Error checking reminders:', error);
