@@ -27,8 +27,7 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
     if (checkDate) {
       const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       if (daysRemaining >= 0 && daysRemaining <= 10) {
-        // Check if a similar Delai already exists
-        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'judgment' });
+         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'judgment' });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'judgment', daysRemaining });
         }
@@ -37,8 +36,9 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
   } else if (category === 'civil') {
     for (const audiance of audiances) {
  
-      const dateR = Math.floor((audiance.dateAudiance.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-       if (audiance.type === 'Plaidoirie') {
+      const dateR = Math.floor((Date.now() -audiance.dateAudiance.getTime()   ) / (1000 * 60 * 60 * 24));
+      if (audiance.type === 'Plaidoirie') {
+        console.log(dateR,"dateR")
         let type = 'plaidoirie';
         if (statusClient === 'plaignant' && dateR === 12) {
           const existingDelai = await Delai.findOne({ avocatId, affaireId, category :'plaidoirie' ,  audianceId: audiance._id, type });

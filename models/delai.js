@@ -17,7 +17,7 @@ const DelaiSchema = new mongoose.Schema({
       },
     type: {
       type: String,
-      enum: ['judgment', 'appeal', 'cassation', 'audience', 'premiere_audience'],
+      enum: ['judgment', 'appel', 'cassation', 'audience', 'premiere_audience' , 'plaidoirie'],
       required: true
     },
     category: {
