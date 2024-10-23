@@ -127,53 +127,40 @@ exports.getAudiancesByAffaire= async (req, res) => {
     return res.status(500).json({ message: 'Error fetching audiance', error });
   }
 };
-
- exports.updateAudiance = async (req, res) => {
+exports.updateAudiance = async (req, res) => {
   try {
-    const { dateAudiance, description, inventaires, affairesData, addressData,type, file } = req.body;
-
+    const {
+      dateAudiance,
+      description,
+       numero,
+      tribunalId,
+      type,
+      files
+    } = req.body;
+ 
     let updatedAudiance = await Audiance.findById(req.params.id);
     if (!updatedAudiance) {
       return res.status(404).json({ message: 'Audiance not found' });
     }
 
-     updatedAudiance.dateAudiance = dateAudiance || updatedAudiance.dateAudiance;
-    updatedAudiance.description = description || updatedAudiance.description;
-    updatedAudiance.type = type || updatedAudiance.type;
+    if (typeof dateAudiance !== 'undefined') updatedAudiance.dateAudiance = dateAudiance;
+    if (typeof description !== 'undefined') updatedAudiance.description = description;
+    if (typeof type !== 'undefined') updatedAudiance.type = type;
+    if (typeof numero !== 'undefined') updatedAudiance.numero = numero;
+    if (typeof tribunalId !== 'undefined') updatedAudiance.tribunal = tribunalId;
 
-    updatedAudiance.inventaires = inventaires || updatedAudiance.inventaires;
-    updatedAudiance.file = file || updatedAudiance.file;
+    if (typeof files !== 'undefined') updatedAudiance.files = Array.isArray(files) ? files : [files];
 
-     if (affairesData) {
-      let affaire = await Affaire.findById(affairesData._id);
-      if (affaire) {
-        affaire.numeroAffaire = affairesData.numeroAffaire;
-        affaire.natureAffaire = affairesData.natureAffaire;
-        affaire.opposite = affairesData.opposite;
-
-        affaire.aboutissement = affairesData.aboutissement;
-        await affaire.save();
-        updatedAudiance.affaires = affaire._id;
-      }
-    }
-
-     if (addressData) {
-      let address = await Address.findById(addressData._id);
-      if (address) {
-        address.city = addressData.city;
-        address.nom = addressData.nom;
-        address.address = addressData.address;
-        await address.save();
-        updatedAudiance.address = address._id;
-      }
-    }
 
     await updatedAudiance.save();
-    return res.status(200).json(updatedAudiance);
+    const populatedAudiance = await Audiance.findById(updatedAudiance._id)
+      .populate('tribunal'); 
+    return res.status(200).json(populatedAudiance);
   } catch (error) {
     return res.status(500).json({ message: 'Error updating audiance', error });
   }
 };
+
 
  exports.deleteAudiance = async (req, res) => {
   try {

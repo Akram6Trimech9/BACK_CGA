@@ -69,8 +69,9 @@ exports.searchProces = async (req, res) => {
         }
 
          const processes = await Proces.find(query)
-            .populate('client', 'username lastname')  
-            .populate('tribunal')  
+            .populate('client', 'username lastname ')  
+            .populate('tribunal')
+            .populate('folder')  
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
@@ -94,7 +95,7 @@ exports.findByFolder = async (req, res) => {
         const { page = 1, limit = 10 } = req.query;
 
         const processes = await Proces.find({ folder: folderId })
-            .populate('tribunal')  // Populate the tribunal field
+            .populate('tribunal')   
             .limit(limit * 1)   
             .skip((page - 1) * limit)
             .exec();

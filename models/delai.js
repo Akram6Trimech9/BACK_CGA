@@ -13,7 +13,7 @@ const DelaiSchema = new mongoose.Schema({
     audianceId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Audiance',
-        required: true
+        // required: true
       },
     type: {
       type: String,
