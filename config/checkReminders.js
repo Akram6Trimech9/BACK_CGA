@@ -21,9 +21,12 @@ async function checkReminders() {
 }
 
 async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande) {
-  if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'présence') {
+  if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presense') {
+
+
     const checkDate = aboutissement.date || aboutissement.dateAppel || aboutissement.dateCassation;
     if (checkDate) {
+
       const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       if (daysRemaining >= 0 && daysRemaining <= 10) {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'judgment' });
