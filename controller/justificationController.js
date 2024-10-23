@@ -2,11 +2,12 @@ const asyncHandler = require('express-async-handler');
 const Justification = require('../models/justification');
 
  exports.createJustification = asyncHandler(async (req, res) => {
-    const { date, type, situationClient, avocatAssocie } = req.body;
+    const { date, type, situationClient, avocatAssocie , natureJugement  } = req.body;
 
      if (type === 'Jugee') {
         const justificationData = {
             date,
+            natureJugement,
             type,
             situationClient,
             avocatAssocie,
@@ -22,13 +23,14 @@ const Justification = require('../models/justification');
 
  exports.updateJustification = asyncHandler(async (req, res) => {
     const { justificationId } = req.params;
-    const { date, type, situationClient, avocatAssocie } =  req.body
+    const { date, type, situationClient, avocatAssocie  , natureJugement} =  req.body
  
  console.log(req.file,"file")
 
           const justificationData = {
             date,
             type,
+            natureJugement,
             situationClient,
             avocatAssocie,
             copieJugement: req.file ? req.file.path : undefined 

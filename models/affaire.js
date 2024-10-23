@@ -27,7 +27,7 @@ var affaireSchema = new mongoose.Schema({
     },
     degre:{
         type: String,
-        enum : ['première_instance', 'appel', 'cassastion','demande de réexamen', 'oppositionPremier' ,'oppositionAppel'],
+        enum : ['première_instance', 'appel', 'cassation','demande de réexamen', 'oppositionPremier' ,'oppositionAppel'],
         required: true
     },
     opposite: {
