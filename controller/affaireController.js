@@ -123,13 +123,13 @@ exports.getAffaireByAdmin = async(req,res) =>{
 exports.updateAffaire = async (req, res) => {
     try {
         const { affaireId } = req.params;
-        const { numeroAffaire,category, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
+        const { numeroAffaire,category,degre, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
 
-        const filePath = req.file ? req.file.path : file; // Use the uploaded file path or the existing file path
+        const filePath = req.file ? req.file.path : file; 
 
         const updatedAffaire = await Affaire.findByIdAndUpdate(
             affaireId,
-            { numeroAffaire, natureAffaire,category, opposite, aboutissement, folder: folderId, file: filePath, credit },
+            { numeroAffaire, natureAffaire,category,degre, opposite, aboutissement, folder: folderId, file: filePath, credit },
             { new: true }
         );
 
