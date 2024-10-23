@@ -16,10 +16,12 @@ exports.createAffaire = async (req, res) => {
             opposite,            
             degre,               
             category,
-             statusClient,         
-            dateDemande,  
+            statusClient,         
+            dateDemande
          } = req.body;
         
+
+         console.log(dateDemande,"dateDemande")
          const { folderId } = req.params;
 
          if (!numeroAffaire || !natureAffaire || !category  || !opposite || !degre || !folderId) {
