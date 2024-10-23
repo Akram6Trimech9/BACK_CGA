@@ -21,7 +21,7 @@ async function checkReminders() {
 }
 
 async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande) {
-  if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presense') {
+  if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presence') {
 
 
     const checkDate = aboutissement.date || aboutissement.dateAppel || aboutissement.dateCassation;

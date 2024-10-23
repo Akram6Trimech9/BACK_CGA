@@ -27,7 +27,7 @@ const JustificationSchema = new mongoose.Schema({
     },
     natureJugement: { 
         type: String, 
-        enum:['presense','absence'],
+        enum:['presence','absence'],
         required: false
     },
     situationClient: {  
