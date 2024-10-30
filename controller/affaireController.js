@@ -125,8 +125,10 @@ exports.getAffaireByAdmin = async(req,res) =>{
 exports.updateAffaire = async (req, res) => {
     try {
         const { affaireId } = req.params;
-        const { numeroAffaire, category, degre, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
+        const { numeroAffaire, category, degre,  statusClient ,natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
 
+
+        console.log(statusClient)
          const filePath = req.file ? req.file.path : file; 
 
          const updateData = {
@@ -143,6 +145,10 @@ exports.updateAffaire = async (req, res) => {
 
          if (req.body.dateDemande) {
             updateData.dateDemande = req.body.dateDemande;
+        }
+
+        if (req.body.statusClient) {
+            updateData.statusClient = req.body.statusClient;
         }
 
          const updatedAffaire = await Affaire.findByIdAndUpdate(

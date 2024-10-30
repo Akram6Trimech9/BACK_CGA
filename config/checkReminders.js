@@ -21,6 +21,7 @@ async function checkReminders() {
 }
 
 async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande ,client) {
+  console.log(statusClient)
   if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presence') {
     const checkDate = aboutissement.date || aboutissement.dateAppel || aboutissement.dateCassation;
     if (checkDate) {
@@ -36,7 +37,6 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
     for (const audiance of audiances) {
       const dateR = Math.floor((audiance.dateAudiance.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       let type;
-
       if (audiance.type === 'Plaidoirie') {
         type = 'plaidoirie';
         if ((statusClient === 'plaignant' && dateR === 12) || (statusClient === 'accuse' && dateR === 5)) {
