@@ -47,14 +47,14 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
         }
       } else if (audiance.type === 'Première audience' && dateR === 21) {
         type = 'premiere_audience';
-        const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type  , clientId : client   });
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type  , clientId : client  ,  category: 'convocation'  });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type, category: 'convocation', daysRemaining: dateR, audianceId: audiance._id , clientId : client  });
         }
       }
         else if (audiance.type === 'Première audience' && dateR === 10) {
       type = 'premiere_audience';
-      const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type , clientId : client  });
+      const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type , clientId : client   , category: 'publication' });
       if (!existingDelai) {
         await Delai.create({ avocatId, affaireId, type, category: 'publication', daysRemaining: dateR, audianceId: audiance._id , clientId : client  });
       }
