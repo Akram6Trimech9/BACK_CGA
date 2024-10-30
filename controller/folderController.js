@@ -75,8 +75,7 @@ const createFolder = async (req, res) => {
             client,
             avocat
         });
-        console.log(newFolder, clientFinded, avocatFinded, "avocatFinded")
-        await newFolder.save();
+         await newFolder.save();
 
         clientFinded.folders = clientFinded.folders || [];
         clientFinded.folders.push(newFolder._id);
@@ -87,26 +86,55 @@ const createFolder = async (req, res) => {
         await clientFinded.save();
         await avocatFinded.save();
 
-        res.status(201).json(newFolder);
+
+        const folderRes = await Folder.findById(newFolder._id).populate('client').populate('avocat')
+
+
+        res.status(201).json(folderRes);
     } catch (error) {
         res.status(500).json({ message: 'Error creating folder', error: error.message });
     }
 };
-
 const getFoldersByAvocat = async (req, res) => {
     try {
         const avocatId = req.params.avocatId;
-        const folders = await Folder.find({ avocat: avocatId }).populate('client avocat');
-        console.log(folders)
+        const { page = 1, limit = 10, searchNumber, searchTitle, clientId, isRectified, isExecuted } = req.query;
 
-        if (!folders.length) {
-            return res.status(404).json({ message: 'No folders found for this avocat' });
-        }
-        res.status(200).json(folders);
+        // Build the filter based on query parameters
+        const filter = {
+            avocat: avocatId,
+            ...(searchNumber && {
+                numberFolder: Number(searchNumber) 
+            }),
+            ...(searchTitle && {
+                titleFolder: { $regex: searchTitle, $options: 'i' } 
+            }),
+            ...(clientId && {
+                client: clientId  
+            }),
+            ...(typeof isRectified !== 'undefined' && { isRectified: isRectified === 'true' }),
+            ...(typeof isExecuted !== 'undefined' && { isExecuted: isExecuted === 'true' }),
+        };
+
+        const folders = await Folder.find(filter)
+            .populate('client avocat')
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        const totalFolders = await Folder.countDocuments(filter);
+
+        res.status(200).json({
+            folders,
+            totalPages: Math.ceil(totalFolders / limit),
+            currentPage: Number(page),
+            totalItems: totalFolders,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
+
 
 const getFoldersByClient = async (req, res) => {
     try {

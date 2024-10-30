@@ -5,6 +5,11 @@ const DelaiSchema = new mongoose.Schema({
       ref: 'User',
       required: true
     },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
     affaireId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Affaire',
@@ -22,7 +27,7 @@ const DelaiSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['publication', 'plaidoirie', 'convocation', 'cassation', 'premiere_audience'],
+        enum: ['publication', 'plaidoirie', 'convocation', 'cassation', 'premiere_audience','information'],
         required: false
       },
     daysRemaining: {

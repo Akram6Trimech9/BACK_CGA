@@ -12,7 +12,7 @@ async function checkReminders() {
     for (const affair of affairs) {
       const { audiances, degre, aboutissement, category, statusClient, dateDemande, folder } = affair;
 
-      await checkDegreeDeadlines(audiances, degre, aboutissement, folder.avocat, affair._id, category, statusClient, dateDemande);
+      await checkDegreeDeadlines(audiances, degre, aboutissement, folder.avocat, affair._id, category, statusClient, dateDemande , folder.client);
       await handleUpcomingAudiences(affair, folder.avocat, category, statusClient);
     }
   } catch (error) {
@@ -20,19 +20,15 @@ async function checkReminders() {
   }
 }
 
-async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande) {
-console.log(aboutissement)
+async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande ,client) {
   if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presence') {
-    console.log('checkDate')
-
     const checkDate = aboutissement.date || aboutissement.dateAppel || aboutissement.dateCassation;
     if (checkDate) {
-console.log(checkDate)
-      const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+       const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       if (daysRemaining >= 0 && daysRemaining <= 10) {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'judgment' });
         if (!existingDelai) {
-          await Delai.create({ avocatId, affaireId, type: 'judgment', daysRemaining });
+          await Delai.create({ avocatId, affaireId, type: 'judgment', daysRemaining  , clientId : client });
         }
       }
     }
@@ -44,26 +40,47 @@ console.log(checkDate)
       if (audiance.type === 'Plaidoirie') {
         type = 'plaidoirie';
         if ((statusClient === 'plaignant' && dateR === 12) || (statusClient === 'accuse' && dateR === 5)) {
-          const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type });
+          const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type , clientId : client  });
           if (!existingDelai) {
-            await Delai.create({ avocatId, affaireId, type, daysRemaining: dateR, audianceId: audiance._id });
+            await Delai.create({ avocatId, affaireId, type, category:'plaidoirie', daysRemaining: dateR, audianceId: audiance._id , clientId : client  });
           }
         }
       } else if (audiance.type === 'Première audience' && dateR === 21) {
         type = 'premiere_audience';
-        const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type });
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type  , clientId : client   });
         if (!existingDelai) {
-          await Delai.create({ avocatId, affaireId, type, category: 'publication', daysRemaining: dateR, audianceId: audiance._id });
+          await Delai.create({ avocatId, affaireId, type, category: 'convocation', daysRemaining: dateR, audianceId: audiance._id , clientId : client  });
         }
       }
+        else if (audiance.type === 'Première audience' && dateR === 10) {
+      type = 'premiere_audience';
+      const existingDelai = await Delai.findOne({ avocatId, affaireId, audianceId: audiance._id, type , clientId : client  });
+      if (!existingDelai) {
+        await Delai.create({ avocatId, affaireId, type, category: 'publication', daysRemaining: dateR, audianceId: audiance._id , clientId : client  });
+      }
+      }   
     }
+    
 
     if (degre === 'appel' && aboutissement && aboutissement.date) {
       const daysAfterJudgment = Math.floor((Date.now() - aboutissement.date.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysAfterJudgment === 23) {
-        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' });
+      const daysAfterConvocation = Math.floor((Date.now() - aboutissement.dateConvocation.getTime()) / (1000 * 60 * 60 * 24));
+
+      if(aboutissement.type==='Jugement Primaire' ){
+  const dateInformation = Math.floor((Date.now() - aboutissement.dateInformation.getTime()) / (1000 * 60 * 60 * 24));
+ 
+  if(dateInformation === 18){
+    const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel'  , category:'information' , clientId : client });
+    if (!existingDelai) {
+      await Delai.create({ avocatId, affaireId, type: 'appel', category:'information' , daysRemaining: 0  , clientId : client    });
+    }
+   }
+}
+
+      if (daysAfterConvocation && daysAfterConvocation === 25  ) {
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel'  , category:'convocation', clientId : client   });
         if (!existingDelai) {
-          await Delai.create({ avocatId, affaireId, type: 'appel', daysRemaining: 0 });
+          await Delai.create({ avocatId, affaireId, type: 'appel' ,  category:'convocation', daysRemaining: 0 });
         }
       }
     } else if (degre === 'cassation' && dateDemande) {
@@ -71,10 +88,11 @@ console.log(checkDate)
       if (daysSinceDemand === 28) {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'cassation' });
         if (!existingDelai) {
-          await Delai.create({ avocatId, affaireId, type: 'cassation', daysRemaining: 0 });
+          await Delai.create({ avocatId, affaireId, type: 'cassation', category:'cassation' , daysRemaining: 0   });
         }
       }
     }
+    
   }
 }
 

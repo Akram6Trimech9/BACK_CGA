@@ -2,13 +2,14 @@ const express =  require('express')
 const router = express.Router() ;
 const upload = require("../config/imageUpload");
 const {authMiddleware,isAdmin} = require('../middlewares/authMiddleware')
-const {verifiedAccount ,createUserForGuest ,searchClients ,getClients ,getAvocats,verifyAccountWithCode, loginAdmin ,  resetPassword , forgotPasswordToken , updatePassword , logout , createUser , handleRefreshToken , unBlockUser , blockUser, login ,getAllUsers , getOneUser , deleteUser ,updateUser, sendVerificationLink, addSousAdmin} = require('../controller/userController') 
+const {verifiedAccount ,createUserForGuest ,addClientForAdmin , searchClients ,getClients ,getAvocats,verifyAccountWithCode, loginAdmin ,  resetPassword , forgotPasswordToken , updatePassword , logout , createUser , handleRefreshToken , unBlockUser , blockUser, login ,getAllUsers , getOneUser , deleteUser ,updateUser, sendVerificationLink, addSousAdmin} = require('../controller/userController') 
 
 
 router.post('/forgotpassword', forgotPasswordToken )
 router.post('/signup'  ,upload.single("userProfile"), createUser)
 router.post('/signup/guest/:idGuest', createUserForGuest )
 router.post('/signup/sous-admin/:adminId', addSousAdmin )
+router.post('/signup/client/:adminId', addClientForAdmin )
 router.post('/login',login)
 router.post('/verify-account',verifyAccountWithCode)
 router.post('/loginadmin', loginAdmin )

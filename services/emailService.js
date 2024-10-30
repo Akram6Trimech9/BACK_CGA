@@ -119,6 +119,40 @@ async function sendCredentielToSousAdmin(to, email, password, cabinet) {
     `
   };
 
+
+
+   try {
+    const info = await transporter.sendMail(mailOptions);
+     return info;
+  } catch (err) {
+    console.log('Erreur lors de l\'envoi des identifiants:', err);
+    throw err;
+  }
+}
+
+async function sendCredentielToClient(to, email, password, avocat) {
+  const subject = 'Vous avez été ajouté en tant que client';
+  const attachments = [];  
+  const mailOptions = {
+    from: 'akramtrimech97@gmail.com',  
+    to: to,
+    subject: `Invitation de l'avocat  ${avocat.username} ${avocat.lastname}   `,
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+        <h1 style="color: #0d529f;">Bienvenue en tant que Client !</h1>
+        <p>L'administrateur de <strong>  ${avocat.username} ${avocat.lastname} </strong> vous a ajouté comme  un client  sur notre plateforme.</p>
+        <p>Voici vos identifiants de connexion :</p>
+        <p><strong>Email :</strong> ${email}</p>
+        <p><strong>Mot de passe :</strong> ${password}</p>
+        <p>Nous vous recommandons de changer votre mot de passe après votre première connexion.</p>
+        <p style="font-size: 16px;">À très bientôt !</p>
+        <p style="color: #ffd146;">L'équipe</p>
+      </div>
+    `
+  };
+
+
+  
    try {
     const info = await transporter.sendMail(mailOptions);
      return info;
@@ -131,6 +165,7 @@ async function sendCredentielToSousAdmin(to, email, password, cabinet) {
 
 module.exports = {
   sendEmailWithAttachments,
+  sendCredentielToClient,
   readHTMLTemplate,
   sendWelcomeWithCredentials,
   sendWelcomeEmail,

@@ -4,7 +4,7 @@ const {generateToken} = require('../config/jwt')
 const asyncHandler = require('express-async-handler')
 const validateMongoDbId = require('../utils/validateMongoDbId')
 const {generateRefreshToken} =require('../config/refreshToken')
-const { sendEmailWithAttachments, sendWelcomeWithCredentials, sendCredentielToSousAdmin } = require('../services/emailService');
+const { sendEmailWithAttachments, sendWelcomeWithCredentials, sendCredentielToSousAdmin, sendCredentielToClient } = require('../services/emailService');
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv').config();
@@ -510,8 +510,7 @@ const searchClients = async (req, res) => {
   try {
     const avocat = await User.findById(avocatId).populate('clients');
 
-    // Check if avocat exists
-    if (!avocat) {
+     if (!avocat) {
       return res.status(404).json({
         success: false,
         message: 'Avocat not found'
@@ -535,6 +534,50 @@ const searchClients = async (req, res) => {
     });
   }
 };
+const addClientForAdmin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { adminId } = req.params;
+
+      const findUser = await User.findOne({ email });
+    if (findUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+     let userProfilePath = null;
+    if (req.file) {
+      userProfilePath = `${process.env.BACKEND_URL}/uploads/images/${req.file.filename}`;
+    }
+
+     const newUser = new User({
+      ...req.body,
+      userProfile: userProfilePath,
+      isBlocked: false,
+      verificationCode: ''
+    });
+
+     const saved = await newUser.save();
+
+     const updateAdmin = await User.findByIdAndUpdate(
+      adminId,
+      { $push: { clients: saved._id } },
+      { new: true }
+    );
+
+
+ 
+
+     if (updateAdmin) {
+       await sendCredentielToClient(req.body.email, req.body.email, req.body.password, updateAdmin);
+      return res.status(201).json(saved);
+    } else {
+      return res.status(400).json({ message: 'Something went wrong during the update process' });
+    }
+  } catch (error) {
+     return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
 const addSousAdmin = async (req, res) => {
   try {
     const { email } = req.body;
@@ -590,4 +633,4 @@ const addSousAdmin = async (req, res) => {
 };
 
 
-module.exports = {addSousAdmin,createUserForGuest,searchClients,verifyAccountWithCode,getClients, getAvocats ,verifiedAccount , sendVerificationLink, loginAdmin , resetPassword , forgotPasswordToken ,  updatePassword , logout ,  handleRefreshToken , createUser, login , getAllUsers , getOneUser , deleteUser , updateUser ,blockUser , unBlockUser } ;
+module.exports = {addSousAdmin, addClientForAdmin , createUserForGuest,searchClients,verifyAccountWithCode,getClients, getAvocats ,verifiedAccount , sendVerificationLink, loginAdmin , resetPassword , forgotPasswordToken ,  updatePassword , logout ,  handleRefreshToken , createUser, login , getAllUsers , getOneUser , deleteUser , updateUser ,blockUser , unBlockUser } ;

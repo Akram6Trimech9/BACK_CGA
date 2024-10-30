@@ -125,26 +125,40 @@ exports.getAffaireByAdmin = async(req,res) =>{
 exports.updateAffaire = async (req, res) => {
     try {
         const { affaireId } = req.params;
-        const { numeroAffaire,category,degre, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
+        const { numeroAffaire, category, degre, natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
 
-        const filePath = req.file ? req.file.path : file; 
+         const filePath = req.file ? req.file.path : file; 
 
-        const updatedAffaire = await Affaire.findByIdAndUpdate(
+         const updateData = {
+            numeroAffaire,
+            natureAffaire,
+            category,
+            degre,
+            opposite,
+            aboutissement,
+            folder: folderId,
+            file: filePath,
+            credit
+        };
+
+         if (req.body.dateDemande) {
+            updateData.dateDemande = req.body.dateDemande;
+        }
+
+         const updatedAffaire = await Affaire.findByIdAndUpdate(
             affaireId,
-            { numeroAffaire, natureAffaire,category,degre, opposite, aboutissement, folder: folderId, file: filePath, credit },
-            { new: true }
+            updateData,
+            { new: true }   
         );
 
-        const oldAffaire = await Affaire.findById(affaireId);
-        if (oldAffaire.folder) {
-            await Folder.findByIdAndUpdate(
+         const oldAffaire = await Affaire.findById(affaireId);
+        if (oldAffaire.folder && oldAffaire.folder.toString() !== folderId) {
+             await Folder.findByIdAndUpdate(
                 oldAffaire.folder,
                 { $pull: { affairs: affaireId } }
             );
-        }
 
-        if (folderId) {
-            await Folder.findByIdAndUpdate(
+             await Folder.findByIdAndUpdate(
                 folderId,
                 { $addToSet: { affairs: affaireId } }
             );
@@ -156,8 +170,7 @@ exports.updateAffaire = async (req, res) => {
     }
 };
 
-// Get an Affaire by ID
-exports.getAffaireById = async (req, res) => {
+ exports.getAffaireById = async (req, res) => {
     try {
         const { affaireId } = req.params;
         const affaire = await Affaire.findById(affaireId).populate('folder').populate('inventaire').populate('audiances').populate('credit').populate('aboutissement')
@@ -183,8 +196,7 @@ exports.getAffaireByFolder = async (req, res) => {
     }
 };
 
-// Delete an Affaire
-exports.deleteAffaire = async (req, res) => {
+ exports.deleteAffaire = async (req, res) => {
     try {
         const { affaireId } = req.params;
         
