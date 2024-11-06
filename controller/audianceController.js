@@ -132,7 +132,7 @@ exports.updateAudiance = async (req, res) => {
     const {
       dateAudiance,
       description,
-       numero,
+      numero,
       tribunalId,
       type,
       files

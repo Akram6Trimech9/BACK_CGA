@@ -87,6 +87,11 @@ var userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Folder'
     }],
+    gsFolders: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GsFolder'
+    }],
+ 
  
     refreshToken:{
         type: String 

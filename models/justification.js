@@ -9,17 +9,10 @@ const JustificationSchema = new mongoose.Schema({
         type: Date,
         required: false
     },
-    dateConvocation: { 
-        type: Date,
-        required: false
-    },
     type: { 
         type: String,
         default: "En Attente",
         enum: [
-            'Jugement Primaire',
-            'Jugement Appel',
-            'Jugement Prononcé',
             'Jugee',
             'Non Jugee',
             'En Attente',

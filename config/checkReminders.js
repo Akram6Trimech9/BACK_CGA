@@ -21,8 +21,7 @@ async function checkReminders() {
 }
 
 async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande ,client) {
-  console.log(statusClient)
-  if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presence') {
+   if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presence') {
     const checkDate = aboutissement.date || aboutissement.dateAppel || aboutissement.dateCassation;
     if (checkDate) {
        const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));

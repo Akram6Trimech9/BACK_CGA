@@ -17,9 +17,11 @@ exports.createAffaire = async (req, res) => {
             degre,               
             category,
             statusClient,         
-            dateDemande
+            dateDemande,
+            dateInformation,
+            dateConvocation
          } = req.body;
-        
+  
 
          console.log(dateDemande,"dateDemande")
          const { folderId } = req.params;
@@ -42,6 +44,8 @@ exports.createAffaire = async (req, res) => {
 
          if (dateDemande) affaireData.dateDemande = dateDemande;
         if (statusClient) affaireData.statusClient = statusClient;
+        if (dateInformation) affaireData.dateInformation = dateInformation;
+        if (dateConvocation) affaireData.dateConvocation = dateConvocation;
 
         const newAffaire = new Affaire(affaireData);
  
@@ -140,11 +144,19 @@ exports.updateAffaire = async (req, res) => {
             aboutissement,
             folder: folderId,
             file: filePath,
+
             credit
         };
 
          if (req.body.dateDemande) {
             updateData.dateDemande = req.body.dateDemande;
+        }
+
+         if (req.body.dateConvocation) {
+            updateData.dateConvocation = req.body.dateConvocation;
+        }
+        if (req.body.dateInformation) {
+            updateData.dateInformation = req.body.dateInformation;
         }
 
         if (req.body.statusClient) {

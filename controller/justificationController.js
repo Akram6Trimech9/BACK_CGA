@@ -1,17 +1,22 @@
 const asyncHandler = require('express-async-handler');
 const Justification = require('../models/justification');
 
- exports.createJustification = asyncHandler(async (req, res) => {
-    const { date, type, situationClient, avocatAssocie , natureJugement  } = req.body;
+// Create Justification
+exports.createJustification = asyncHandler(async (req, res) => {
+    const { date, type, situationClient, avocatAssocie, natureJugement, dateInformation } = req.body;
 
-     if (type === 'Jugee') {
+    console.log(req.body);
+
+    if (type === 'Jugee') {
+        // Build the justificationData object conditionally
         const justificationData = {
-            date,
-            natureJugement,
             type,
-            situationClient,
-            avocatAssocie,
-            copieJugement: req.copieJugement ? req.copieJugement.path : undefined  
+            ...(date && { date }), // Add `date` only if it exists
+            ...(natureJugement && { natureJugement }), // Add `natureJugement` only if it exists
+            ...(situationClient && { situationClient }), // Add `situationClient` only if it exists
+            ...(avocatAssocie && { avocatAssocie }), // Add `avocatAssocie` only if it exists
+            ...(dateInformation && { dateInformation }), // Add `dateInformation` only if it exists
+            ...(req.copieJugement && { copieJugement: req.copieJugement.path }) // Add `copieJugement` only if it exists
         };
 
         const justification = await Justification.create(justificationData);
@@ -21,46 +26,49 @@ const Justification = require('../models/justification');
     }
 });
 
- exports.updateJustification = asyncHandler(async (req, res) => {
+// Update Justification
+exports.updateJustification = asyncHandler(async (req, res) => {
     const { justificationId } = req.params;
-    const { date, type, situationClient, avocatAssocie  , natureJugement} =  req.body
- 
- console.log(req.file,"file")
+    const { date, type, situationClient, avocatAssocie, natureJugement, dateInformation } = req.body;
 
-          const justificationData = {
-            date,
-            type,
-            natureJugement,
-            situationClient,
-            avocatAssocie,
-            copieJugement: req.file ? req.file.path : undefined 
-        };
-   
+    console.log(req.file, "file");
 
-       
-        const justification = await Justification.findByIdAndUpdate(justificationId, justificationData, {
-            new: true,
-            runValidators: true
-        });
+    // Build the justificationData object conditionally
+    const justificationData = {
+        ...(date && { date }),
+        ...(type && { type }),
+        ...(natureJugement && { natureJugement }),
+        ...(situationClient && { situationClient }),
+        ...(avocatAssocie && { avocatAssocie }),
+        ...(dateInformation && { dateInformation }),
+        ...(req.file && { copieJugement: req.file.path }) // Add file path only if it exists
+    };
 
-        if (!justification) {
-            return res.status(404).json({ message: 'Justification not found' });
-        }
+    const justification = await Justification.findByIdAndUpdate(justificationId, justificationData, {
+        new: true,
+        runValidators: true
+    });
 
-        res.json(justification);
+    if (!justification) {
+        return res.status(404).json({ message: 'Justification not found' });
+    }
+
+    res.json(justification);
 });
 
-exports.getJustificationById = asyncHandler(async (req, res) => { 
- const {idJustification } = req.params
-  try{
-    const justification = await  Justification.findById(idJustification)
-      if(justification){ 
-        res.status(200).json(justification)
-      }else{ 
-         res.status(404).json({message : 'Justification not found '})
-      }
-  }catch(err){ 
-    res.status(500).json(err)
-  }
-})
+// Get Justification By ID
+exports.getJustificationById = asyncHandler(async (req, res) => {
+    const { idJustification } = req.params;
 
+    try {
+        const justification = await Justification.findById(idJustification);
+
+        if (justification) {
+            res.status(200).json(justification);
+        } else {
+            res.status(404).json({ message: 'Justification not found' });
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});

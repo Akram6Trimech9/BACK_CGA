@@ -25,6 +25,14 @@ var affaireSchema = new mongoose.Schema({
         type: Date,
         required: false
     },
+    dateInformation: { 
+        type: Date,
+        required: false
+    },
+    dateConvocation: { 
+        type: Date,
+        required: false
+    },
     degre:{
         type: String,
         enum : ['première_instance', 'appel', 'cassation','demande de réexamen', 'oppositionPremier' ,'oppositionAppel'],

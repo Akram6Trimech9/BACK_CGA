@@ -51,6 +51,7 @@ const guestRoute  = require('./routes/guestRoute')
 const tribinauxRoute  = require('./routes/tribinauxRoute')
 const delaiRoute  = require('./routes/delaiRoute')
 const cabinetRoute  = require('./routes/cabinetRoute')
+const fileRoute  = require('./routes/fileRoute')
 
 const procesRoute  = require('./routes/procesRoute')
 const transactionRoute  = require('./routes/transactionRoute')
@@ -82,6 +83,7 @@ app.use('/api/proces', procesRoute);
 app.use('/api/delai', delaiRoute);
 app.use('/api/cabinet', cabinetRoute);
 app.use('/api/transaction', transactionRoute);
+app.use('/api/file', fileRoute);
 
 app.use(notFound);
 app.use(errorHandler);
