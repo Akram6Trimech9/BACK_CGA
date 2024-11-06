@@ -30,7 +30,7 @@ const Delai = require('../models/delai');
 // Get a single Delai by ID
 exports.getDelaiById = async (req, res) => {
   try {
-    const delai = await Delai.findById(req.params.id).populate('avocatId affaireId audianceId');
+    const delai = await Delai.findById(req.params.id).populate('avocatId affaireId audianceId  clientId');
     if (!delai) {
       return res.status(404).json({ error: 'Delai not found' });
     }
@@ -81,7 +81,7 @@ exports.getDelaiById = async (req, res) => {
     if (type) filter.type = type;
     if (category) filter.category = category;
 
-    const delais = await Delai.find(filter).populate('avocatId affaireId audianceId');
+    const delais = await Delai.find(filter).populate('avocatId affaireId audianceId clientId ');
     res.status(200).json(delais);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching Delais for Admin', details: error });
@@ -91,7 +91,7 @@ exports.getDelaiById = async (req, res) => {
   try {
     const { avocatId } = req.params;
 
-     const delais = await Delai.find({ avocatId }).populate('avocatId affaireId audianceId');
+     const delais = await Delai.find({ avocatId }).populate('avocatId affaireId audianceId clientId');
     
     if (!delais || delais.length === 0) {
       return res.status(404).json({ error: 'No Delais found for this Avocat' });

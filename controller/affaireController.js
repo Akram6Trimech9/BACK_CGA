@@ -128,14 +128,14 @@ exports.getAffaireByAdmin = async(req,res) =>{
 }
 exports.updateAffaire = async (req, res) => {
     try {
-        const { affaireId } = req.params;
-        const { numeroAffaire, category, degre,  statusClient ,natureAffaire, opposite, aboutissement, folderId, file, credit } = req.body;
+         const { affaireId } = req.params;
+        const { numeroAffaire, category, degre,  statusClient ,natureAffaire, opposite, aboutissement, folderId, file, credit  } = req.body;
 
 
         console.log(statusClient)
          const filePath = req.file ? req.file.path : file; 
 
-         const updateData = {
+          const updateData = {
             numeroAffaire,
             natureAffaire,
             category,
@@ -144,7 +144,6 @@ exports.updateAffaire = async (req, res) => {
             aboutissement,
             folder: folderId,
             file: filePath,
-
             credit
         };
 

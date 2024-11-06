@@ -30,7 +30,7 @@ var audianceSchema = new mongoose.Schema({
     }, 
     type: {
         type: String,
-        enum: ['Première audience', 'Audience préparatoire', 'Plaidoirie'],
+        enum: ['Première audience', 'Audience préparatoire', 'plaidoirie'],
         required: true
     },
  
