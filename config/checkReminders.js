@@ -24,13 +24,13 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
  
     if (checkDate) {
       const daysRemaining = Math.floor(Math.abs((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))+1;
-       if ( daysRemaining >=1 &&  daysRemaining <= 10  && degre === 'appel') {
+       if ( daysRemaining >= 1  &&  daysRemaining <= 10  && degre === 'appel') {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' , category: 'appel' ,  clientId: client });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'appel', category: 'appel' ,  daysRemaining, clientId: client });
         }
       }else if(daysRemaining >= 1 && daysRemaining  <= 10  && degre === 'cassation'){
-        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' , category: 'appel' ,  clientId: client });
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'cassation' , category: 'cassation' ,  clientId: client });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'cassation', category: 'cassation' ,  daysRemaining, clientId: client });
         }
