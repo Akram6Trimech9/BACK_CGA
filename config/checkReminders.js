@@ -75,7 +75,7 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
 
 
       if (aboutissement?.dateInformation) {
-        const dateInformation = Math.floor(Math.abs( Date.now() - aboutissement.dateInformation.getTime() ) / (1000 * 60 * 60 * 24)) + 1;
+        const dateInformation = Math.floor(Math.abs( aboutissement.dateInformation.getTime()  -Date.now()  ) / (1000 * 60 * 60 * 24)) + 1;
 
         if (dateInformation >=1 && dateInformation <=18 ) {
           const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel', category: 'information', clientId: client });
@@ -104,7 +104,7 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
     } else if (degre === 'cassation' && dateDemande) {
       const daysSinceDemand = Math.floor(Math.abs(( new Date(dateDemande).getTime() - Date.now()  ) / (1000 * 60 * 60 * 24)));
   
-      if (daysSinceDemand === 28) {
+      if (daysSinceDemand >= 1 && daysSinceDemand <=28) {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'cassation'  , category: 'cassation' ,  clientId: client });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'cassation', category: 'cassation', daysRemaining: 0 ,   clientId: client  });
