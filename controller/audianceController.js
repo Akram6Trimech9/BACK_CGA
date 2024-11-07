@@ -2,7 +2,8 @@ const Audiance = require('../models/audiance');
 const Affaire = require('../models/affaire');
 const Address = require('../models/address');
 const Folder = require('../models/folder')
- 
+const Delai = require('../models/delai')
+
 exports.addAudiance = async (req, res) => {
   try {
     const { dateAudiance, description, tribunalId, numero  , type} = req.body;
@@ -166,9 +167,13 @@ exports.updateAudiance = async (req, res) => {
   try {
     const audiance = await Audiance.findByIdAndDelete(req.params.id);
 
+
+
+
     if (!audiance) {
       return res.status(404).json({ message: 'Audiance not found' });
     }
+    await Delai.deleteMany({ audianceId: audiance._id });
 
      return res.status(200).json({ message: 'Audiance deleted successfully' });
   } catch (error) {
