@@ -22,12 +22,12 @@ const DelaiSchema = new mongoose.Schema({
       },
     type: {
       type: String,
-      enum: ['judgment', 'appel', 'cassation', 'audience', 'premiere_audience' , 'plaidoirie'],
+      enum: ['judgment', 'appel', 'cassation', 'audience','documentation' , 'premiere_audience' , 'plaidoirie'],
       required: true
     },
     category: {
         type: String,
-        enum: ['publication', 'plaidoirie', 'appel',  'convocation', 'cassation', 'premiere_audience','information'],
+        enum: ['publication', 'plaidoirie', 'appel',  'convocation', 'cassation', 'documentation', 'premiere_audience','information'],
         required: false
       },
     daysRemaining: {

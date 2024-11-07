@@ -34,6 +34,11 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'cassation', category: 'cassation' ,  daysRemaining, clientId: client });
         }
+      }else if(daysRemaining >= 1 && daysRemaining  <= 27  && degre === 'cassation'){
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'documentation' , category: 'documentation' ,  clientId: client });
+        if (!existingDelai) {
+          await Delai.create({ avocatId, affaireId, type: 'documentation', category: 'documentation' ,  daysRemaining, clientId: client });
+        }
       }
       
     }
