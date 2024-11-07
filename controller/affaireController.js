@@ -3,7 +3,9 @@ const Folder = require('../models/folder');
 const Justification = require('../models/justification')
 const User= require('../models/user')
 const Credit= require('../models/credit')
-
+const Audiance= require('../models/audiance')
+const Delai= require('../models/delai')
+ 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const { generatePDF } = require('../services/generatePdf');
@@ -213,25 +215,37 @@ exports.getAffaireByFolder = async (req, res) => {
     }
 };
 
- exports.deleteAffaire = async (req, res) => {
+exports.deleteAffaire = async (req, res) => {
     try {
         const { affaireId } = req.params;
         
-        const affaire = await Affaire.findById(affaireId);
+         const affaire = await Affaire.findById(affaireId);
         if (!affaire) {
             return res.status(404).json({ success: false, message: 'Affaire not found' });
         }
 
-        if (affaire.folder) {
+         await Audiance.deleteMany({ affaires: affaireId });
+
+         await Delai.deleteMany({ affaireId: affaireId });
+
+         await Credit.deleteMany({ affaire: affaireId });
+
+ 
+
+         if (affaire.aboutissement) {
+            await Justification.findByIdAndDelete(affaire.aboutissement);
+        }
+
+         if (affaire.folder) {
             await Folder.findByIdAndUpdate(
                 affaire.folder,
                 { $pull: { affairs: affaireId } }
             );
         }
 
-        await Affaire.findByIdAndDelete(affaireId);
+         await Affaire.findByIdAndDelete(affaireId);
 
-        res.status(200).json({ success: true, message: 'Affaire deleted successfully' });
+        res.status(200).json({ success: true, message: 'Affaire and related data deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

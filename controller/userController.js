@@ -474,7 +474,7 @@ const updatePassword = asyncHandler(async (req,res )=> {
 
 const getAvocats = async (req, res) => {
     try {
-        const avocats = await User.find({ role: 'ADMIN' }).select('username lastname email userProfile _id');  
+      const avocats = await User.find({$or: [{ role: 'ADMIN' }, { role: 'SOUS_ADMIN' }]});
         res.status(200).json({
             success: true,
             data: avocats

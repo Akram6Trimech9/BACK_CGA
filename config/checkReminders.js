@@ -21,17 +21,21 @@ async function checkReminders() {
 async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, affaireId, category, statusClient, dateDemande, client , dateConvocation) {
   if (category === 'pénale' && aboutissement && aboutissement.natureJugement === 'presence') {
     const checkDate = aboutissement?.date || aboutissement?.dateAppel || aboutissement?.dateCassation;
-    console.log(checkDate)
-
+ 
     if (checkDate) {
-      const daysRemaining = Math.floor((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-
-      if ( daysRemaining <= 10) {
-        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' });
+      const daysRemaining = Math.floor(Math.abs((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))+1;
+       if ( daysRemaining <= 10  && degre === 'appel') {
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' , category: 'appel' ,  clientId: client });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'appel', category: 'appel' ,  daysRemaining, clientId: client });
         }
+      }else if(daysRemaining <= 10  && degre === 'cassation'){
+        const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' , category: 'appel' ,  clientId: client });
+        if (!existingDelai) {
+          await Delai.create({ avocatId, affaireId, type: 'cassation', category: 'cassation' ,  daysRemaining, clientId: client });
+        }
       }
+      
     }
   } else if (category === 'civil') {
 
