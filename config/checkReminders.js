@@ -24,19 +24,21 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
  
     if (checkDate) {
       const daysRemaining = Math.floor(Math.abs((checkDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))+1;
-       if ( daysRemaining >= 1  &&  daysRemaining <= 10  && degre === 'appel') {
+       if ( daysRemaining >= 0  &&  daysRemaining <= 10  && degre === 'appel') {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'appel' , category: 'appel' ,  clientId: client });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'appel', category: 'appel' ,  daysRemaining, clientId: client });
         }
-      }else if(daysRemaining >= 1 && daysRemaining  <= 27  && degre === 'cassation'){
+      }else if(daysRemaining >= 0 && daysRemaining  <= 27  && degre === 'cassation'){
+        
 
-        if(daysRemaining >= 10){
+        if(daysRemaining >= 0 && daysRemaining <=10){
+          
           const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'cassation' , category: 'cassation' ,  clientId: client });
           if (!existingDelai) {
             await Delai.create({ avocatId, affaireId, type: 'cassation', category: 'cassation' ,  daysRemaining, clientId: client });
           }
-        }else{ 
+        }else if (daysRemaining >= 0 && daysRemaining <=27) { 
           const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'documentation' , category: 'documentation' ,  clientId: client });
           if (!existingDelai) {
             await Delai.create({ avocatId, affaireId, type: 'documentation', category: 'documentation' ,  daysRemaining, clientId: client });
@@ -113,7 +115,7 @@ async function checkDegreeDeadlines(audiances, degre, aboutissement, avocatId, a
     } else if (degre === 'cassation' && dateDemande) {
       const daysSinceDemand = Math.floor(Math.abs(( new Date(dateDemande).getTime() - Date.now()  ) / (1000 * 60 * 60 * 24)));
   
-      if (daysSinceDemand >= 1 && daysSinceDemand <= 28) {
+      if (daysSinceDemand >= 0 && daysSinceDemand <= 28) {
         const existingDelai = await Delai.findOne({ avocatId, affaireId, type: 'cassation'  , category: 'cassation' ,  clientId: client });
         if (!existingDelai) {
           await Delai.create({ avocatId, affaireId, type: 'cassation', category: 'cassation', daysRemaining: 0 ,   clientId: client  });
